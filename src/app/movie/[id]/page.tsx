@@ -1,21 +1,19 @@
 // src/app/movie/[id]/page.tsx
 
 import MovieDetailClient from "@/components/MovieDetailClient";
-import { Movie } from "@/types/movie"; // ✅ Import tipe Movie
+import { Movie } from "@/types/movie";
 
 export const dynamic = "force-dynamic";
 
-// ✅ Beri tipe pada movie agar tidak pakai "any"
-export async function generateStaticParams() {
-  const res = await fetch("https://686bc80014219674dcc614c3.mockapi.io/movies");
-  const movies: Movie[] = await res.json();
+// ✅ Beri typing eksplisit sesuai struktur Next.js
+type PageProps = {
+  params: {
+    id: string;
+  };
+};
 
-  return movies.map((movie) => ({
-    id: movie.id,
-  }));
-}
-
-export default async function MovieDetailPage({ params }: { params: { id: string } }) {
+// ✅ Gunakan typing PageProps di parameter
+export default async function MovieDetailPage({ params }: PageProps) {
   const id = params.id;
 
   const res = await fetch(`https://686bc80014219674dcc614c3.mockapi.io/movies/${id}`, {
@@ -30,7 +28,17 @@ export default async function MovieDetailPage({ params }: { params: { id: string
     );
   }
 
-  const movie: Movie = await res.json(); // ✅ Gunakan tipe Movie
+  const movie: Movie = await res.json();
 
   return <MovieDetailClient movie={movie} />;
+}
+
+// ✅ generateStaticParams juga harus pakai typing Movie[]
+export async function generateStaticParams() {
+  const res = await fetch("https://686bc80014219674dcc614c3.mockapi.io/movies");
+  const movies: Movie[] = await res.json();
+
+  return movies.map((movie) => ({
+    id: movie.id,
+  }));
 }
