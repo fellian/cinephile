@@ -7,9 +7,11 @@ export const dynamic = "force-dynamic";
 export default async function MovieDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const res = await fetch(`https://686bc80014219674dcc614c3.mockapi.io/movies/${params.id}`, {
+  const { id } = await params;
+
+  const res = await fetch(`https://686bc80014219674dcc614c3.mockapi.io/movies/${id}`, {
     cache: "no-store",
   });
 
