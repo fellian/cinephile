@@ -1,6 +1,6 @@
 // src/app/movie/[id]/page.tsx
-import MovieDetailClient from "@/components/MovieDetailClient";
 import { Movie } from "@/types/movie";
+import MovieDetailClient from "@/components/MovieDetailClient";
 
 export const dynamic = "force-dynamic";
 
