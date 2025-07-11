@@ -2,24 +2,25 @@
 
 import MovieDetailClient from "@/components/MovieDetailClient";
 
-export const dynamic = "force-dynamic"; // Optional: agar fetch selalu fresh
+export const dynamic = "force-dynamic";
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
+// Optional: bantu Next tahu semua ID film jika pakai SSG
+export async function generateStaticParams() {
+  const res = await fetch("https://686bc80014219674dcc614c3.mockapi.io/movies");
+  const movies = await res.json();
 
-export default async function MovieDetailPage({ params }: Props) {
-  // Ambil ID dari parameter URL
+  return movies.map((movie: any) => ({
+    id: movie.id,
+  }));
+}
+
+export default async function MovieDetailPage({ params }: { params: { id: string } }) {
   const id = params.id;
 
-  // Fetch data film berdasarkan ID dari mockapi
   const res = await fetch(`https://686bc80014219674dcc614c3.mockapi.io/movies/${id}`, {
     cache: "no-store",
   });
 
-  // Jika gagal fetch
   if (!res.ok) {
     return (
       <div className="py-10 text-center text-red-600 font-semibold">
@@ -28,9 +29,7 @@ export default async function MovieDetailPage({ params }: Props) {
     );
   }
 
-  // Parse JSON hasil response
   const movie = await res.json();
 
-  // Render MovieDetailClient dengan props movie
   return <MovieDetailClient movie={movie} />;
 }
