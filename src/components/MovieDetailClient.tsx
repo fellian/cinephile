@@ -1,17 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-type Movie = {
-  id: string;
-  title: string;
-  genre: string;
-  rating: number;
-  image: string;
-  releaseDate: string;
-  description: string;
-  views: string;
-};
+import Image from "next/image";
+import Link from "next/link";
+import { Movie } from "@/types/movie";
 
 export default function MovieDetailClient({ movie }: { movie: Movie }) {
   const [favourites, setFavourites] = useState<string[]>([]);
@@ -47,12 +39,16 @@ export default function MovieDetailClient({ movie }: { movie: Movie }) {
 
   return (
     <section className="py-10 max-w-3xl mx-auto px-4">
-      <img
-        src={movie.image}
-        alt={movie.title}
-        className="w-full object-cover rounded-lg mb-6 max-h-[500px] cursor-pointer"
-        onClick={() => window.open(movie.image, "_blank")}
-      />
+      <div className="relative w-full h-[500px] mb-6 cursor-pointer">
+        <Image
+          src={movie.image}
+          alt={movie.title}
+          layout="fill"
+          objectFit="cover"
+          className="rounded-lg"
+          onClick={() => window.open(movie.image, "_blank")}
+        />
+      </div>
 
       <h1 className="text-3xl font-bold mb-2">{movie.title}</h1>
 
@@ -77,9 +73,9 @@ export default function MovieDetailClient({ movie }: { movie: Movie }) {
       </button>
 
       <div className="mt-6">
-        <a href="/" className="text-blue-600 hover:underline font-medium">
+        <Link href="/" className="text-blue-600 hover:underline font-medium">
           ← Back to Home
-        </a>
+        </Link>
       </div>
     </section>
   );

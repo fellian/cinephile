@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { getAllMovies } from "@/lib/api";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+import { Movie } from "@/types/movie";
 
 export default function TrendingPage() {
-  const [movies, setMovies] = useState<any[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get("search")?.toLowerCase() || "";
 
@@ -31,11 +33,10 @@ export default function TrendingPage() {
   useEffect(() => {
     const fetchMovies = async () => {
       const all = await getAllMovies();
-
       const sorted = [...all].sort((a, b) => {
         const viewsA = parseViews(a.views);
         const viewsB = parseViews(b.views);
-        return viewsB - viewsA; // dari terbanyak ke terkecil
+        return viewsB - viewsA;
       });
 
       setMovies(sorted);
@@ -44,7 +45,7 @@ export default function TrendingPage() {
     fetchMovies();
   }, []);
 
-  const filteredMovies = movies.filter((movie: any) =>
+  const filteredMovies = movies.filter((movie) =>
     movie.title.toLowerCase().includes(searchTerm)
   );
 
@@ -55,14 +56,18 @@ export default function TrendingPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredMovies.length === 0 ? (
-          <p className="col-span-full text-gray-500 italic text-center">No movies found.</p>
+          <p className="col-span-full text-gray-500 italic text-center">
+            No movies found.
+          </p>
         ) : (
-          filteredMovies.map((movie: any) => (
+          filteredMovies.map((movie) => (
             <Link href={`/movie/${movie.id}`} key={movie.id}>
               <div className="border rounded-xl shadow-sm p-4 hover:shadow-md transition cursor-pointer bg-white">
-                <img
+                <Image
                   src={movie.image}
                   alt={movie.title}
+                  width={300}
+                  height={450}
                   className="aspect-[2/3] object-cover rounded mb-3 w-full"
                 />
                 <h3 className="font-semibold text-lg">{movie.title}</h3>

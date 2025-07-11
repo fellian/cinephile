@@ -5,4 +5,6 @@ export type Movie = {
   views: number;
   releaseDate: string;
   image: string;
+  description: string;
+  rating: number;
 };
