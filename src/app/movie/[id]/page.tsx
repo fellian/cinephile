@@ -1,15 +1,16 @@
 // src/app/movie/[id]/page.tsx
 
 import MovieDetailClient from "@/components/MovieDetailClient";
+import { Movie } from "@/types/movie"; // ✅ Import tipe Movie
 
 export const dynamic = "force-dynamic";
 
-// Optional: bantu Next tahu semua ID film jika pakai SSG
+// ✅ Beri tipe pada movie agar tidak pakai "any"
 export async function generateStaticParams() {
   const res = await fetch("https://686bc80014219674dcc614c3.mockapi.io/movies");
-  const movies = await res.json();
+  const movies: Movie[] = await res.json();
 
-  return movies.map((movie: any) => ({
+  return movies.map((movie) => ({
     id: movie.id,
   }));
 }
@@ -29,7 +30,7 @@ export default async function MovieDetailPage({ params }: { params: { id: string
     );
   }
 
-  const movie = await res.json();
+  const movie: Movie = await res.json(); // ✅ Gunakan tipe Movie
 
   return <MovieDetailClient movie={movie} />;
 }
