@@ -1,17 +1,17 @@
 // src/app/movie/[id]/page.tsx
-import MovieDetailClient from "@/components/MovieDetailClient";
 import { Movie } from "@/types/movie";
+import MovieDetailClient from "@/components/MovieDetailClient";
+
+type Props = {
+  params: {
+    id: string;
+  };
+};
 
 export const dynamic = "force-dynamic";
 
-export default async function MovieDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
-
-  const res = await fetch(`https://686bc80014219674dcc614c3.mockapi.io/movies/${id}`, {
+export default async function MovieDetailPage({ params }: Props) {
+  const res = await fetch(`https://686bc80014219674dcc614c3.mockapi.io/movies/${params.id}`, {
     cache: "no-store",
   });
 
@@ -28,7 +28,7 @@ export default async function MovieDetailPage({
   return <MovieDetailClient movie={movie} />;
 }
 
-export async function generateStaticParams(): Promise<{ id: string }[]> {
+export async function generateStaticParams(): Promise<Props["params"][]> {
   const res = await fetch("https://686bc80014219674dcc614c3.mockapi.io/movies");
   const movies: Movie[] = await res.json();
 
