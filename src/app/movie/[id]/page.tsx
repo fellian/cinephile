@@ -2,15 +2,19 @@
 import { Movie } from "@/types/movie";
 import MovieDetailClient from "@/components/MovieDetailClient";
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // Gunakan SSR agar data selalu fresh (opsional)
 
-export default async function MovieDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+// ✅ Tipe props untuk App Router Page
+type PageProps = {
+  params: {
+    id: string;
+  };
+};
+
+// ✅ Fungsi utama halaman detail film
+export default async function MovieDetailPage({ params }: PageProps) {
   const res = await fetch(`https://686bc80014219674dcc614c3.mockapi.io/movies/${params.id}`, {
-    cache: "no-store",
+    cache: "no-store", // Nonaktifkan cache agar data selalu up-to-date
   });
 
   if (!res.ok) {
@@ -25,8 +29,14 @@ export default async function MovieDetailPage({
   return <MovieDetailClient movie={movie} />;
 }
 
-export async function generateStaticParams(): Promise<{ id: string }[]> {
+// ✅ Fungsi untuk pre-render halaman secara statis (opsional)
+export async function generateStaticParams(): Promise<PageProps["params"][]> {
   const res = await fetch("https://686bc80014219674dcc614c3.mockapi.io/movies");
+
+  if (!res.ok) {
+    return []; // Jika error saat fetch, return array kosong
+  }
+
   const movies: Movie[] = await res.json();
 
   return movies.map((movie) => ({
