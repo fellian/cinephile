@@ -1,20 +1,15 @@
 // src/app/movie/[id]/page.tsx
-
 import MovieDetailClient from "@/components/MovieDetailClient";
 import { Movie } from "@/types/movie";
 
 export const dynamic = "force-dynamic";
 
-// ✅ Beri typing eksplisit sesuai struktur Next.js
-type PageProps = {
-  params: {
-    id: string;
-  };
-};
-
-// ✅ Gunakan typing PageProps di parameter
-export default async function MovieDetailPage({ params }: PageProps) {
-  const id = params.id;
+export default async function MovieDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id } = params;
 
   const res = await fetch(`https://686bc80014219674dcc614c3.mockapi.io/movies/${id}`, {
     cache: "no-store",
@@ -33,8 +28,7 @@ export default async function MovieDetailPage({ params }: PageProps) {
   return <MovieDetailClient movie={movie} />;
 }
 
-// ✅ generateStaticParams juga harus pakai typing Movie[]
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ id: string }[]> {
   const res = await fetch("https://686bc80014219674dcc614c3.mockapi.io/movies");
   const movies: Movie[] = await res.json();
 
