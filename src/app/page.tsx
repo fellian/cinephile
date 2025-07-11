@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getAllMovies } from "@/lib/api";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
+import { Movie } from "@/types/movie";
 
 export default function HomePageClientWrapper() {
-  const [movies, setMovies] = useState<any[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [favourites, setFavourites] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedGenre, setSelectedGenre] = useState("All");
@@ -16,10 +18,9 @@ export default function HomePageClientWrapper() {
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get("search")?.toLowerCase() || "";
 
-  // 🔁 Ambil user dan favourites berdasarkan akun login
   useEffect(() => {
     const fetchMovies = async () => {
-      const data = await getAllMovies();
+      const data: Movie[] = await getAllMovies();
       setMovies(data);
       setLoading(false);
     };
@@ -37,7 +38,6 @@ export default function HomePageClientWrapper() {
     }
   }, []);
 
-  // 🔁 Toggle favourite hanya jika login
   const toggleFavourite = (id: string) => {
     if (!userKey) {
       alert("Please login to use the favourites feature.");
@@ -52,17 +52,15 @@ export default function HomePageClientWrapper() {
     localStorage.setItem(`favourites-${userKey}`, JSON.stringify(updated));
   };
 
-  // 🔁 Ambil semua genre unik
   const genreSet = new Set<string>();
   movies.forEach((movie) => {
-    movie.genre.split(",").forEach((g: string) => genreSet.add(g.trim()));
+    movie.genre.split(",").forEach((g) => genreSet.add(g.trim()));
   });
   const genres = ["All", ...Array.from(genreSet).sort()];
 
-  // 🔍 Filter berdasarkan search & genre
   const filteredMovies = movies.filter((movie) => {
     const matchesSearch = movie.title.toLowerCase().includes(searchTerm);
-    const movieGenres = movie.genre.split(",").map((g: string) => g.trim());
+    const movieGenres = movie.genre.split(",").map((g) => g.trim());
     const matchesGenre =
       selectedGenre === "All" || movieGenres.includes(selectedGenre);
     return matchesSearch && matchesGenre;
@@ -101,7 +99,7 @@ export default function HomePageClientWrapper() {
         <p className="text-center text-gray-500 italic">No movies found.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredMovies.map((movie: any, index: number) => (
+          {filteredMovies.map((movie, index) => (
             <motion.div
               key={movie.id}
               initial={{ opacity: 0, y: 20 }}
@@ -110,9 +108,11 @@ export default function HomePageClientWrapper() {
               className="border rounded-xl shadow-sm p-4 hover:shadow-md transition bg-white"
             >
               <Link href={`/movie/${movie.id}`}>
-                <img
+                <Image
                   src={movie.image}
                   alt={movie.title}
+                  width={300}
+                  height={450}
                   className="aspect-[2/3] object-cover rounded mb-3 w-full"
                 />
                 <h3 className="font-semibold text-lg">{movie.title}</h3>
