@@ -3,15 +3,25 @@
 import { useEffect, useState } from "react";
 import { getAllMovies } from "@/lib/api";
 import Link from "next/link";
+import Image from "next/image"; // Ganti <img> jadi <Image>
+
+type Movie = {
+  id: string;
+  title: string;
+  genre: string;
+  views: number;
+  releaseDate: string;
+  image: string;
+};
 
 export default function FavouritesPage() {
   const [favourites, setFavourites] = useState<string[]>([]);
-  const [movies, setMovies] = useState<any[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [userKey, setUserKey] = useState<string | null>(null);
 
   useEffect(() => {
-    const user = localStorage.getItem("currentUserKey"); // gunakan key unik
+    const user = localStorage.getItem("currentUserKey");
     setUserKey(user);
 
     if (!user) return;
@@ -20,8 +30,8 @@ export default function FavouritesPage() {
     setFavourites(storedFavs);
 
     const fetchMovies = async () => {
-      const allMovies = await getAllMovies();
-      const favMovies = allMovies.filter((movie: any) =>
+      const allMovies: Movie[] = await getAllMovies();
+      const favMovies = allMovies.filter((movie) =>
         storedFavs.includes(movie.id)
       );
       setMovies(favMovies);
@@ -77,9 +87,11 @@ export default function FavouritesPage() {
           {movies.map((movie) => (
             <Link href={`/movie/${movie.id}`} key={movie.id}>
               <div className="border rounded-xl shadow-sm p-4 hover:shadow-md transition cursor-pointer bg-white">
-                <img
+                <Image
                   src={movie.image}
                   alt={movie.title}
+                  width={300}
+                  height={450}
                   className="aspect-[2/3] object-cover rounded mb-3 w-full"
                 />
                 <h3 className="font-semibold text-lg">{movie.title}</h3>
