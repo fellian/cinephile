@@ -14,6 +14,8 @@ export default function HomePageClientWrapper() {
   const [loading, setLoading] = useState(true);
   const [selectedGenre, setSelectedGenre] = useState("All");
   const [userKey, setUserKey] = useState<string | null>(null);
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get("search")?.toLowerCase() || "";
@@ -40,7 +42,7 @@ export default function HomePageClientWrapper() {
 
   const toggleFavourite = (id: string) => {
     if (!userKey) {
-      alert("Please login to use the favourites feature.");
+      setShowLoginAlert(true);
       return;
     }
 
@@ -50,6 +52,14 @@ export default function HomePageClientWrapper() {
 
     setFavourites(updated);
     localStorage.setItem(`favourites-${userKey}`, JSON.stringify(updated));
+
+    // show toast message
+    const message = favourites.includes(id)
+      ? "❌ Removed from Favourites"
+      : "❤️ Added to Favourites";
+
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(null), 2500);
   };
 
   const genreSet = new Set<string>();
@@ -67,36 +77,53 @@ export default function HomePageClientWrapper() {
   });
 
   return (
-    <section className="py-10 px-4">
-      <h2 className="text-2xl md:text-3xl font-bold mb-2 text-center">🎬 Explore Movies</h2>
-      <p className="text-gray-700 mb-6 text-center">
+    <section className="py-10 px-4 min-h-screen text-white relative">
+      {/* Toast */}
+      {toastMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-pink-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out">
+          {toastMessage}
+        </div>
+      )}
+
+      <h2 className="text-3xl md:text-4xl font-bold mb-2 text-center">
+        🎬 Explore Movies
+      </h2>
+      <p className="text-gray-300 mb-6 text-center">
         Browse and filter your favourite movies!
       </p>
 
       {/* 🔽 Filter Genre */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-        <label htmlFor="genre" className="font-medium text-gray-700">
-          Filter by Genre:
-        </label>
-        <select
-          id="genre"
-          value={selectedGenre}
-          onChange={(e) => setSelectedGenre(e.target.value)}
-          className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {genres.map((genre) => (
-            <option key={genre} value={genre}>
-              {genre}
-            </option>
-          ))}
-        </select>
-      </div>
+      {!loading && (
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="font-semibold text-gray-300">🎭 Filter by Genre:</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-2 scroll-smooth custom-scrollbar">
+            {genres.map((genre) => (
+              <button
+                key={genre}
+                onClick={() => setSelectedGenre(genre)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition whitespace-nowrap ${
+                  selectedGenre === genre
+                    ? "bg-pink-500 text-white shadow"
+                    : "bg-slate-700 text-gray-300 hover:bg-slate-600"
+                }`}
+              >
+                {genre}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 🎥 Movie Cards */}
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+        <div className="text-center text-gray-400 py-20">
+          <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          Loading movies...
+        </div>
       ) : filteredMovies.length === 0 ? (
-        <p className="text-center text-gray-500 italic">No movies found.</p>
+        <p className="text-center text-gray-400 italic">No movies found.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredMovies.map((movie, index) => (
@@ -105,7 +132,7 @@ export default function HomePageClientWrapper() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05, duration: 0.3 }}
-              className="border rounded-xl shadow-sm p-4 hover:shadow-md transition bg-white"
+              className="border border-slate-700 rounded-xl bg-slate-800 shadow-md p-4 hover:shadow-xl transition transform hover:scale-[1.02]"
             >
               <Link href={`/movie/${movie.id}`}>
                 <Image
@@ -116,17 +143,17 @@ export default function HomePageClientWrapper() {
                   className="aspect-[2/3] object-cover rounded mb-3 w-full"
                 />
                 <h3 className="font-semibold text-lg">{movie.title}</h3>
-                <p className="text-sm text-gray-600">{movie.genre}</p>
-                <p className="text-sm text-gray-500">👁️ {movie.views}</p>
-                <p className="text-xs text-gray-500 mt-1">📅 {movie.releaseDate}</p>
+                <p className="text-sm text-gray-300">{movie.genre}</p>
+                <p className="text-sm text-gray-400">👁️ {movie.views}</p>
+                <p className="text-xs text-gray-400 mt-1">📅 {movie.releaseDate}</p>
               </Link>
 
               <button
                 onClick={() => toggleFavourite(movie.id)}
                 className={`mt-3 px-3 py-1 text-sm rounded w-full transition ${
                   favourites.includes(movie.id)
-                    ? "bg-pink-200 text-pink-700 font-semibold"
-                    : "bg-pink-100 text-pink-600 hover:bg-pink-200"
+                    ? "bg-pink-400 text-pink-900 font-semibold"
+                    : "bg-pink-300 text-pink-800 hover:bg-pink-400"
                 }`}
               >
                 {favourites.includes(movie.id)
@@ -135,6 +162,32 @@ export default function HomePageClientWrapper() {
               </button>
             </motion.div>
           ))}
+        </div>
+      )}
+
+      {/* Login Alert Modal */}
+      {showLoginAlert && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-800 text-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-xl font-bold mb-3 text-pink-400">Login Required</h2>
+            <p className="text-sm text-gray-300 mb-4">
+              Please login to use the favourites feature.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowLoginAlert(false)}
+                className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-1 rounded"
+              >
+                Close
+              </button>
+              <Link
+                href="/profile"
+                className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-1 rounded"
+              >
+                Login
+              </Link>
+            </div>
+          </div>
         </div>
       )}
     </section>

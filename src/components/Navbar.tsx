@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import clsx from "clsx";
 import { FaBars, FaTimes, FaSearch } from "react-icons/fa";
+import { useDebouncedCallback } from "use-debounce";
 
 export const Navbar = () => {
   const pathname = usePathname();
@@ -20,39 +21,38 @@ export const Navbar = () => {
     { name: "My Profile", path: "/profile" },
   ];
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      router.push(`/?search=${encodeURIComponent(searchTerm)}`);
-      setIsSearchOpen(false);
-      setSearchTerm("");
-    }
+  // Debounced search handler
+  const updateSearch = useDebouncedCallback((value: string) => {
+    router.push(`/?search=${encodeURIComponent(value)}`);
+  }, 400);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    updateSearch(value);
   };
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md border-b shadow-sm sticky top-0 z-50 w-full">
+    <nav className="bg-gradient-to-r from-gray-900 via-slate-800 to-slate-900 backdrop-blur-md border-b border-slate-700 shadow-md sticky top-0 z-50 w-full">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="text-2xl font-extrabold text-blue-600 tracking-wide hover:text-blue-700 transition-all duration-200"
+          className="text-2xl font-extrabold text-pink-400 tracking-wide hover:text-pink-300 transition-all duration-200"
         >
           🎬 Cinephile
         </Link>
 
-        {/* Desktop Search */}
-        <form
-          onSubmit={handleSearch}
-          className="hidden md:flex flex-grow max-w-md mx-2 gap-2"
-        >
+        {/* Desktop Real-time Search */}
+        <div className="hidden md:flex flex-grow max-w-md mx-2 gap-2">
           <input
             type="text"
             placeholder="Search movies..."
-            className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            className="w-full bg-slate-700 border border-slate-600 px-4 py-2 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
-        </form>
+        </div>
 
         {/* Desktop Navigation */}
         <ul className="hidden md:flex items-center space-x-6">
@@ -63,8 +63,8 @@ export const Navbar = () => {
                 className={clsx(
                   "text-base font-medium transition-all duration-150",
                   pathname === item.path
-                    ? "text-blue-600 font-semibold underline underline-offset-4"
-                    : "text-gray-700 hover:text-blue-500"
+                    ? "text-pink-400 font-semibold underline underline-offset-4"
+                    : "text-gray-300 hover:text-pink-400"
                 )}
               >
                 {item.name}
@@ -76,13 +76,13 @@ export const Navbar = () => {
         {/* Mobile Icons */}
         <div className="md:hidden flex items-center space-x-4">
           <button onClick={() => setIsSearchOpen(!isSearchOpen)}>
-            <FaSearch className="text-gray-700 text-lg hover:text-blue-600 transition" />
+            <FaSearch className="text-gray-300 text-lg hover:text-pink-400 transition" />
           </button>
           <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? (
-              <FaTimes className="text-xl text-gray-800 hover:text-red-500 transition" />
+              <FaTimes className="text-xl text-gray-300 hover:text-red-500 transition" />
             ) : (
-              <FaBars className="text-xl text-gray-800 hover:text-blue-600 transition" />
+              <FaBars className="text-xl text-gray-300 hover:text-pink-400 transition" />
             )}
           </button>
         </div>
@@ -91,31 +91,29 @@ export const Navbar = () => {
       {/* Mobile Search Bar */}
       {isSearchOpen && (
         <div className="md:hidden px-4 pb-3">
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Search movies..."
-              className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </form>
+          <input
+            type="text"
+            placeholder="Search movies..."
+            className="w-full bg-slate-700 border border-slate-600 px-4 py-2 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
         </div>
       )}
 
       {/* Mobile Navigation Dropdown */}
       {isMenuOpen && (
         <div className="md:hidden px-4 pb-4 transition-all duration-300">
-          <ul className="space-y-2 bg-white/90 rounded-lg shadow-lg p-4">
+          <ul className="space-y-2 bg-slate-800 rounded-lg shadow-lg p-4 border border-slate-700">
             {navItems.map((item) => (
               <li key={item.path}>
                 <Link
                   href={item.path}
                   className={clsx(
-                    "block px-4 py-2 rounded-md font-medium transition hover:bg-blue-100",
+                    "block px-4 py-2 rounded-md font-medium transition hover:bg-slate-700",
                     pathname === item.path
-                      ? "text-blue-600 font-semibold"
-                      : "text-gray-800"
+                      ? "text-pink-400 font-semibold"
+                      : "text-gray-300"
                   )}
                   onClick={() => setIsMenuOpen(false)}
                 >
