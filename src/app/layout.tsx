@@ -1,10 +1,14 @@
 // src/app/layout.tsx
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Cinephile - Movie Watchlist",
   description: "Track and favourite your movies easily",
+  icons: {
+    icon: "/cinephile-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
