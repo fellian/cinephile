@@ -30,16 +30,15 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white border-b shadow-sm sticky top-0 z-50 w-full">
+    <nav className="bg-white/80 backdrop-blur-md border-b shadow-sm sticky top-0 z-50 w-full">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo → link ke home */}
+        {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-bold whitespace-nowrap hover:text-blue-600 transition-colors"
+          className="text-2xl font-extrabold text-blue-600 tracking-wide hover:text-blue-700 transition-all duration-200"
         >
           🎬 Cinephile
         </Link>
-
 
         {/* Desktop Search */}
         <form
@@ -49,16 +48,10 @@ export const Navbar = () => {
           <input
             type="text"
             placeholder="Search movies..."
-            className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {/* <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-          >
-            Search
-          </button> */}
         </form>
 
         {/* Desktop Navigation */}
@@ -68,10 +61,10 @@ export const Navbar = () => {
               <Link
                 href={item.path}
                 className={clsx(
-                  "font-medium hover:text-blue-600 transition",
+                  "text-base font-medium transition-all duration-150",
                   pathname === item.path
-                    ? "text-blue-600 font-semibold"
-                    : "text-gray-800"
+                    ? "text-blue-600 font-semibold underline underline-offset-4"
+                    : "text-gray-700 hover:text-blue-500"
                 )}
               >
                 {item.name}
@@ -83,13 +76,13 @@ export const Navbar = () => {
         {/* Mobile Icons */}
         <div className="md:hidden flex items-center space-x-4">
           <button onClick={() => setIsSearchOpen(!isSearchOpen)}>
-            <FaSearch className="text-gray-700 text-lg" />
+            <FaSearch className="text-gray-700 text-lg hover:text-blue-600 transition" />
           </button>
           <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? (
-              <FaTimes className="text-xl text-gray-800" />
+              <FaTimes className="text-xl text-gray-800 hover:text-red-500 transition" />
             ) : (
-              <FaBars className="text-xl text-gray-800" />
+              <FaBars className="text-xl text-gray-800 hover:text-blue-600 transition" />
             )}
           </button>
         </div>
@@ -102,30 +95,24 @@ export const Navbar = () => {
             <input
               type="text"
               placeholder="Search movies..."
-              className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            {/* <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-            >
-              Search
-            </button> */}
           </form>
         </div>
       )}
 
       {/* Mobile Navigation Dropdown */}
       {isMenuOpen && (
-        <div className="md:hidden px-4 pb-4">
-          <ul className="space-y-2">
+        <div className="md:hidden px-4 pb-4 transition-all duration-300">
+          <ul className="space-y-2 bg-white/90 rounded-lg shadow-lg p-4">
             {navItems.map((item) => (
               <li key={item.path}>
                 <Link
                   href={item.path}
                   className={clsx(
-                    "block px-4 py-2 rounded hover:bg-blue-100 transition",
+                    "block px-4 py-2 rounded-md font-medium transition hover:bg-blue-100",
                     pathname === item.path
                       ? "text-blue-600 font-semibold"
                       : "text-gray-800"
