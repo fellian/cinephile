@@ -10,6 +10,7 @@ export default function MovieDetailClient({ movie }: { movie: Movie }) {
   const [userKey, setUserKey] = useState<string | null>(null);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [showTrailer, setShowTrailer] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,7 +40,6 @@ export default function MovieDetailClient({ movie }: { movie: Movie }) {
     setFavourites(updated);
     localStorage.setItem(`favourites-${userKey}`, JSON.stringify(updated));
 
-    // Show toast message
     const message = isFavourite
       ? "❌ Removed from favourites"
       : "❤️ Added to favourites";
@@ -49,7 +49,7 @@ export default function MovieDetailClient({ movie }: { movie: Movie }) {
 
   return (
     <section className="py-10 px-4 min-h-screen text-white relative">
-      {/* Toast Notification */}
+      {/* Toast */}
       {toastMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-pink-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out">
           {toastMessage}
@@ -71,9 +71,10 @@ export default function MovieDetailClient({ movie }: { movie: Movie }) {
           />
         </div>
 
-        {/* Title & Info */}
+        {/* Title */}
         <h1 className="text-4xl font-bold mb-3">{movie.title}</h1>
 
+        {/* Info */}
         <div className="text-gray-300 text-sm mb-6 space-y-1">
           <p><strong className="text-white">Release Date:</strong> {movie.releaseDate}</p>
           <p><strong className="text-white">Genre:</strong> {movie.genre}</p>
@@ -84,17 +85,27 @@ export default function MovieDetailClient({ movie }: { movie: Movie }) {
         {/* Description */}
         <p className="text-gray-200 leading-relaxed mb-6">{movie.description}</p>
 
-        {/* Favourite Button */}
-        <button
-          onClick={handleToggleFavourite}
-          className={`px-5 py-2 rounded-md font-semibold text-sm transition ${
-            isFavourite
-              ? "bg-red-300 text-red-900 hover:bg-red-400"
-              : "bg-pink-500 text-white hover:bg-pink-600"
-          }`}
-        >
-          {isFavourite ? "💔 Remove from Favourite" : "♡ Add to Favourites"}
-        </button>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          {movie.trailerUrl && (
+            <button
+              onClick={() => setShowTrailer(true)}
+              className="px-5 py-2 rounded-md font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition flex items-center"
+            >
+              <span className="mr-2">▶</span> Watch Trailer
+            </button>
+          )}
+
+          <button
+            onClick={handleToggleFavourite}
+            className={`px-5 py-2 rounded-md font-semibold text-sm transition ${isFavourite
+                ? "bg-red-300 text-red-900 hover:bg-red-400"
+                : "bg-pink-500 text-white hover:bg-pink-600"
+              }`}
+          >
+            {isFavourite ? "💔 Remove from Favourite" : "♡ Add to Favourites"}
+          </button>
+        </div>
 
         {/* Back Link */}
         <div className="mt-8">
@@ -107,7 +118,7 @@ export default function MovieDetailClient({ movie }: { movie: Movie }) {
         </div>
       </div>
 
-      {/* Modal Zoom Image */}
+      {/* Zoom Poster Modal */}
       {isZoomOpen && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="relative max-w-3xl w-full">
@@ -128,7 +139,27 @@ export default function MovieDetailClient({ movie }: { movie: Movie }) {
         </div>
       )}
 
-      {/* Modal Login Alert */}
+      {/* Trailer Modal */}
+      {showTrailer && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl aspect-video">
+            <button
+              onClick={() => setShowTrailer(false)}
+              className="absolute top-2 right-2 text-white text-xl bg-black/50 rounded-full p-2 hover:bg-black"
+            >
+              ✕
+            </button>
+            <iframe
+              src={movie.trailerUrl.replace("watch?v=", "embed/")}
+              title="Trailer"
+              allowFullScreen
+              className="w-full h-full rounded-xl"
+            ></iframe>
+          </div>
+        </div>
+      )}
+
+      {/* Login Alert Modal */}
       {showLoginAlert && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-slate-800 text-white rounded-lg shadow-lg p-6 w-full max-w-sm">

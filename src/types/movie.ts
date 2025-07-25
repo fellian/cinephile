@@ -7,4 +7,5 @@ export type Movie = {
   description: string;
   rating: number;
   views: string;
+  trailerUrl: string;
 };
